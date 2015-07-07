@@ -52,5 +52,5 @@ var io = require('socket.io').listen(server);
 require('./socket/socket.js')(io,rooms);
 
 server.listen(app.get('port'),function(){
-    console.log('ChatCAAAAAAAAAAAAAAAAAAAAAAT on Port:'+app.get('port'));
+    console.log('chatty cat on Port:'+app.get('port'));
 });
