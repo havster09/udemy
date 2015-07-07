@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        $(function () {
+            var host = '{{config.host}}';
+            var socket = io.connect(host + '/roomlist');
+
+            socket.on('connect', function () {
+                console.log("connection established on client");
+            });
+
+
+            socket.on('roomupdate', function (data) {
+                var procData = JSON.parse(data);
+                $('.roomlist').html('');
+                for (var i = 0; i < procData.length; i++) {
+                    var str = '<a href="room/' + procData[i].room_number + '"><li>' + procData[i].room_name + '</li></a>';
+                    $('.roomlist').prepend(str);
+                }
+            });
+
+            $(document).on('click', '#create', function () {
+                var room_name = $('.newRoom').val();
+                if (room_name != '') {
+                    var room_number = parseInt(Math.random() * 10000);
+                    socket.emit('newroom', {room_name: room_name, room_number: room_number});
+                    $('.newRoom').val('');
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+<img class="userPic" src="{{user.profilePic}}">
+<h3 class="userName">{{user.fullname}} | <a href="/logout">Logout</a></h3>
+<input type="text" class="newRoom" autocomplete="off">
+<button id="create">Create Room</button>
+<ul class="roomlist">
+
+</ul>
+
+</body>
+</html>

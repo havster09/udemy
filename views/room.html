@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        $(function(){
+            var host = "{{config.host}}";
+            var messages = io.connect(host+'/messages');
+            var roomNum = parseInt('{{room_number}}');
+            var userName = '{{user.fullname}}';
+            var userPic = '{{user.profilePic}}';
+
+            messages.on('connect',function(){
+                console.log('connection established');
+                messages.emit('joinroom',{room:roomNum,user:userName,userPic:userPic});
+            });
+
+            messages.on('messagefeed',function(data){
+                var msgs = JSON.parse(data);
+                updateMessageFeed(msgs.userPic,msgs.message);
+            });
+
+            $(document).on('keyup','.newmessage',function(event){
+                if(event.which === 13 && $(this).val() != ''){
+                    messages.emit('newMessage',{
+                        room_number:roomNum,
+                        user:userName,
+                        userPic:userPic,
+                        message:$(this).val()
+                    });
+                    updateMessageFeed(userPic,$(this).val());
+                    $(this).val('');
+                }
+            });
+
+            function updateMessageFeed(userPic,message){
+                var str = '<li><div class="msgbox"><div class="pic"><img src="'+ userPic +'" class="userPic"></div><div class="msg"><p>'+message+'</p></div></div></li>';
+                $(str).hide().prependTo($('.messages')).slideDown(100);
+            }
+
+            messages.on('updateUsersList',function(data){
+                var userlist = JSON.parse(data);
+                $('.users').html('');
+                for(var i; i < userlist.length;i++){
+                    var str = ' <li><img src=""'+userlist[i].userPic+'"/><p>'+userlist[i].user+'</p></li>';
+                };
+                $(str).prependTo($('.users'));
+            });
+
+            setInterval(function(){
+                messages.emit('updateList',{})
+            },15*1000);
+        });
+    </script>
+</head>
+<body>
+<div class="rm-roomname">
+    <h5>{{room_name}} | <a href="/chatrooms">chatrooms</a></h5>
+</div>
+<div class="rm-messages">
+    <ul class="messages">
+    </ul>
+</div>
+<div class="rm-users">
+    <ul class="users">
+
+    </ul>
+</div>
+<div class="rm-newmessage">
+    <input type="text" class="newmessage" autocomplete="off" placeholder="Type in your message">
+    <input type="submit" class="submit">
+</div>
+
+</body>
+</html>
