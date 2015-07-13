@@ -1,5 +1,5 @@
 {
-  "dbURL":"mongodb://chatcatuser:Qu1ckscop3MSR@ds049568.mongolab.com:49568/chatcat",
+  "dbURL":"mongodb://chatcatuser:<password>@ds049568.mongolab.com:49568/chatcat",
   "sessionSecret":"SNDDNN",
   "fb":{
     "appID":"102834376729083",
